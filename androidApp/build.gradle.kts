@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId = "com.maxrave.simpmusic"
-        minSdk = 26
+        minSdk = 28
         targetSdk = 36
         versionCode =
             libs.versions.version.code

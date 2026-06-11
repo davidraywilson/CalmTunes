@@ -224,7 +224,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.getLocation()
 
         setContent {
-            App(viewModel)
+            com.maxrave.simpmusic.einkui.EinkApp(viewModel)
         }
     }
 

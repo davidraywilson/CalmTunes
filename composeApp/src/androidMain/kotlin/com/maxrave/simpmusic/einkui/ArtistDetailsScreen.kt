@@ -1,0 +1,190 @@
+package com.maxrave.simpmusic.einkui
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Shuffle
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+import com.mudita.mmd.components.buttons.FloatingActionButtonMMD
+import com.mudita.mmd.components.lazy.LazyColumnMMD
+import com.mudita.mmd.components.tabs.PrimaryTabRowMMD
+import com.mudita.mmd.components.tabs.TabMMD
+import com.mudita.mmd.components.text.TextMMD
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ArtistDetailsScreen(
+    artistId: String?,
+    currentSongId: String?,
+    artistSongs: List<SongUiModel>,
+    artistAlbums: List<AlbumUiModel>,
+    isLoading: Boolean,
+    errorMessage: String?,
+    onPlaySongClick: (SongUiModel, List<SongUiModel>) -> Unit,
+    onAlbumClick: (AlbumUiModel) -> Unit,
+    onShuffleSongsClick: (List<SongUiModel>) -> Unit,
+    onAddToPlaylistClick: (SongUiModel) -> Unit,
+    onRemoveFromLibraryClick: (SongUiModel) -> Unit,
+    onDeleteClick: (SongUiModel) -> Unit,
+    onAddToLibraryClick: (SongUiModel) -> Unit,
+    onDownloadClick: (SongUiModel) -> Unit,
+) {
+    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+    val tabOptions = listOf("Songs", "Albums")
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        when {
+            isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    TextMMD(text = "Loading artist...")
+                }
+            }
+
+            errorMessage != null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        TextMMD(text = "Error loading artist")
+                        TextMMD(text = errorMessage!!)
+                    }
+                }
+            }
+
+            artistSongs.isEmpty() && artistAlbums.isEmpty() -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    TextMMD(text = "No content for this artist yet")
+                }
+            }
+
+            else -> {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    PrimaryTabRowMMD(selectedTabIndex = selectedTab) {
+                        tabOptions.forEachIndexed { index, title ->
+                            TabMMD(
+                                selected = selectedTab == index,
+                                onClick = { selectedTab = index },
+                                text = {
+                                    TextMMD(
+                                        text = title,
+                                        fontSize = 16.sp,
+                                        fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
+                                    )
+                                },
+                            )
+                        }
+                    }
+
+                    if (selectedTab == 0) {
+                        // Songs tab
+                        LazyColumnMMD(
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.Top,
+                        ) {
+                            if (artistSongs.isNotEmpty()) {
+                                items(artistSongs) { song ->
+                                    SongItem(
+                                        song = song,
+                                        isCurrentlyPlaying = song.id == currentSongId,
+                                        onClick = { onPlaySongClick(song, artistSongs) },
+                                        onAddToPlaylist = { onAddToPlaylistClick(song) },
+                                        onRemoveFromLibrary = { onRemoveFromLibraryClick(song) },
+                                        onDelete = { onDeleteClick(song) },
+                                        onAddToLibrary = { onAddToLibraryClick(song) },
+                                        onDownload = { onDownloadClick(song) },
+                                        showDivider = song != artistSongs.lastOrNull(),
+                                        isInLibrary = true,
+                                        canDownload = song.sourceType == SourceType.YOUTUBE,
+                                    )
+                                }
+                            } else {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .height(200.dp),
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        TextMMD(text = "No songs for this artist")
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        // Albums tab
+                        LazyColumnMMD(
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.Top,
+                        ) {
+                            if (artistAlbums.isNotEmpty()) {
+                                items(artistAlbums) { album ->
+                                    AlbumItem(
+                                        album = album,
+                                        onClick = { onAlbumClick(album) },
+                                        showDivider = album != artistAlbums.lastOrNull(),
+                                    )
+                                }
+                            } else {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .height(200.dp),
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        TextMMD(text = "No albums for this artist")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!isLoading && errorMessage == null && artistSongs.isNotEmpty()) {
+            FloatingActionButtonMMD(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp),
+                onClick = { onShuffleSongsClick(artistSongs) },
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Shuffle,
+                    contentDescription = "Shuffle artist songs",
+                )
+            }
+        }
+    }
+}

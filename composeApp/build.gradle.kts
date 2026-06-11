@@ -38,7 +38,7 @@ kotlin {
     android {
         namespace = "com.maxrave.simpmusic.composeapp"
         compileSdk = 37
-        minSdk = 26
+        minSdk = 28
         withJava()
         androidResources {
             enable = true
@@ -77,6 +77,8 @@ kotlin {
             implementation(libs.constraintlayout.compose)
 
             api(libs.work.runtime.ktx)
+
+            implementation("com.mudita:MMD:1.0.0")
 
             // Runtime
             api(libs.startup.runtime)

@@ -8,6 +8,7 @@ pluginManagement {
             url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
         }
         maven("https://jogamp.org/deployment/maven")
+        maven { url = uri("https://mudita.jfrog.io/artifactory/mmd-release") }
     }
 }
 dependencyResolutionManagement {
@@ -22,6 +23,7 @@ dependencyResolutionManagement {
         }
         maven("https://jogamp.org/deployment/maven")
         maven(url = "https://raw.githubusercontent.com/bravepipeproject/maven-repo/master/repository")
+        maven { url = uri("https://mudita.jfrog.io/artifactory/mmd-release") }
     }
 }
 

@@ -548,6 +548,7 @@ fun hsvToColor(
     saturation: Float,
     value: Float,
 ): Color {
+    if (hue.isNaN() || saturation.isNaN() || value.isNaN()) return Color.Transparent
     val c = value * saturation
     val x = c * (1 - abs((hue / 60f) % 2f - 1f))
     val m = value - c
