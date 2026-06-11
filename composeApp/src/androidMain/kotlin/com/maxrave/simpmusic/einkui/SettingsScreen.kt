@@ -50,8 +50,10 @@ fun SettingsScreen(
     includeLocalMusic: Boolean,
     localFolders: List<String>,
     isAppleMusicAuthenticated: Boolean,
+    isYouTubeAuthenticated: Boolean,
     hasBatteryOptimizationExemption: Boolean,
     onConnectAppleMusicClick: () -> Unit,
+    onConnectYouTubeClick: () -> Unit,
     onRequestBatteryOptimizationExemption: () -> Unit,
     onIncludeLocalMusicChange: (Boolean) -> Unit,
     onAddFolderClick: () -> Unit,
@@ -262,6 +264,37 @@ fun SettingsScreen(
                                     checked = completeAlbumsWithYouTube,
                                     onCheckedChange = onCompleteAlbumsWithYouTubeChange,
                                 )
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            TextMMD(
+                                text = "YouTube Music Authentication",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            TextMMD(
+                                text = if (isYouTubeAuthenticated) "YouTube Music is connected" else "YouTube Music is not connected",
+                                fontSize = 16.sp,
+                            )
+
+                            if (!isYouTubeAuthenticated) {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                TextMMD(
+                                    text = "Connect to access your YouTube Music library and enable full app features.",
+                                    fontSize = 14.sp,
+                                )
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                ButtonMMD(
+                                    onClick = onConnectYouTubeClick
+                                ) {
+                                    TextMMD(text = "Connect")
+                                }
                             }
 
                             Spacer(modifier = Modifier.height(8.dp))

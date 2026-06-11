@@ -4,10 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.navigation.NavController
 import com.maxrave.simpmusic.viewModel.LibraryDynamicPlaylistViewModel
 
 @Composable
-fun ArtistsScreenWrapper(viewModel: LibraryDynamicPlaylistViewModel) {
+fun ArtistsScreenWrapper(viewModel: LibraryDynamicPlaylistViewModel, navController: NavController) {
     val artistsState by viewModel.listFollowedArtist.collectAsState()
 
     val mappedArtists = remember(artistsState) {
@@ -29,6 +30,8 @@ fun ArtistsScreenWrapper(viewModel: LibraryDynamicPlaylistViewModel) {
         hasAnySongs = true, // Not strictly checking library songs here for now
         onOpenStreamingSettingsClick = { /* TODO */ },
         onOpenLocalSettingsClick = { /* TODO */ },
-        onArtistClick = { /* TODO */ }
+        onArtistClick = { artist -> 
+            navController.navigate(Screen.ArtistDetails.createRoute(artist.id))
+        }
     )
 }

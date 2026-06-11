@@ -9,7 +9,7 @@ import com.maxrave.simpmusic.viewModel.SharedViewModel
 import com.maxrave.simpmusic.extension.formatDuration
 
 @Composable
-fun SongsScreenWrapper(viewModel: LibraryDynamicPlaylistViewModel, sharedViewModel: SharedViewModel) {
+fun SongsScreenWrapper(viewModel: LibraryDynamicPlaylistViewModel) {
     val songsState by viewModel.listFavoriteSong.collectAsState()
     
     val mappedSongs = remember(songsState) {
@@ -38,9 +38,11 @@ fun SongsScreenWrapper(viewModel: LibraryDynamicPlaylistViewModel, sharedViewMod
         isSyncInProgress = false,
         onPlaySongClick = { song ->
             val videoId = song.remoteId ?: song.id
-            sharedViewModel.loadSharedMediaItem(videoId)
+            viewModel.playSong(videoId, com.maxrave.simpmusic.ui.screen.library.LibraryDynamicPlaylistType.Favorite)
         },
-        onShuffleClick = { /* TODO */ },
+        onShuffleClick = { 
+            viewModel.shuffle(com.maxrave.simpmusic.ui.screen.library.LibraryDynamicPlaylistType.Favorite)
+        },
         onAddToPlaylistClick = { /* TODO */ },
         onRemoveFromLibraryClick = { /* TODO */ },
         onDeleteClick = { /* TODO */ },

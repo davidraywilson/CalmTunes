@@ -36,6 +36,7 @@ data class PlaylistUiModel(
 fun PlaylistsScreen(
     playlists: List<PlaylistUiModel>,
     isInEditMode: Boolean,
+    isLoading: Boolean = false,
     onPlaylistClick: (PlaylistUiModel) -> Unit,
     onAddPlaylistClick: () -> Unit,
     onSelectionChanged: (Set<String>) -> Unit,
@@ -52,7 +53,18 @@ fun PlaylistsScreen(
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
-        if (playlists.isEmpty()) {
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
+            ) {
+                TextMMD(
+                    text = "Loading playlists...",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        } else if (playlists.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,

@@ -25,6 +25,17 @@ sealed class Screen(val route: String, val label: String, val icon: ImageVector)
     object Search : Screen("search", "Search", Icons.Outlined.Search)
     object More : Screen("more", "More", Icons.Outlined.MoreHoriz)
     object Settings : Screen("settings", "Settings", Icons.Outlined.Settings)
+    object Login : Screen("login", "Login", Icons.Outlined.PersonOutline)
+
+    // Helper functions for routes with arguments
+    fun createRoute(vararg args: String): String {
+        return buildString {
+            append(route)
+            args.forEach { arg ->
+                append("/$arg")
+            }
+        }
+    }
 }
 
 val navItems = listOf(

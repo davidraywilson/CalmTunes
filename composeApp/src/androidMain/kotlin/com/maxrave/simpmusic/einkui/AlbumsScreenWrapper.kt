@@ -4,11 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.navigation.NavController
 import com.maxrave.domain.data.entities.AlbumEntity
 import com.maxrave.simpmusic.viewModel.LibraryViewModel
 
 @Composable
-fun AlbumsScreenWrapper(viewModel: LibraryViewModel) {
+fun AlbumsScreenWrapper(viewModel: LibraryViewModel, navController: NavController) {
     val favoritePlaylistsState by viewModel.favoritePlaylist.collectAsState()
 
     val mappedAlbums = remember(favoritePlaylistsState) {
@@ -32,6 +33,8 @@ fun AlbumsScreenWrapper(viewModel: LibraryViewModel) {
         hasAnySongs = true,
         onOpenStreamingSettingsClick = { /* TODO */ },
         onOpenLocalSettingsClick = { /* TODO */ },
-        onAlbumClick = { /* TODO */ }
+        onAlbumClick = { album -> 
+            navController.navigate(Screen.AlbumDetails.createRoute(album.id))
+        }
     )
 }

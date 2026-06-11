@@ -31,9 +31,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.maxrave.domain.mediaservice.handler.RepeatState
+import com.maxrave.simpmusic.viewModel.AlbumViewModel
+import com.maxrave.simpmusic.viewModel.ArtistViewModel
 import com.maxrave.simpmusic.viewModel.LibraryDynamicPlaylistViewModel
 import com.maxrave.simpmusic.viewModel.LibraryViewModel
+import com.maxrave.simpmusic.viewModel.PlaylistViewModel
 import com.maxrave.simpmusic.viewModel.SearchViewModel
+import com.maxrave.simpmusic.viewModel.SettingsViewModel
+import com.maxrave.simpmusic.ui.screen.login.LoginScreen
 import com.maxrave.simpmusic.viewModel.SharedViewModel
 import com.maxrave.simpmusic.viewModel.UIEvent
 import com.mudita.mmd.components.buttons.ButtonMMD
@@ -170,26 +175,66 @@ fun EinkApp(viewModel: SharedViewModel) {
                 ) {
                     composable(Screen.Playlists.route) {
                         val libraryViewModel: LibraryViewModel = koinViewModel()
-                        PlaylistsScreenWrapper(libraryViewModel)
+                        PlaylistsScreenWrapper(libraryViewModel, navController)
                     }
                     composable(Screen.Artists.route) {
                         val dynamicViewModel: LibraryDynamicPlaylistViewModel = koinViewModel()
-                        ArtistsScreenWrapper(dynamicViewModel)
+                        ArtistsScreenWrapper(dynamicViewModel, navController)
                     }
                     composable(Screen.Songs.route) {
                         val dynamicViewModel: LibraryDynamicPlaylistViewModel = koinViewModel()
-                        SongsScreenWrapper(dynamicViewModel, viewModel)
+                        SongsScreenWrapper(dynamicViewModel)
                     }
                     composable(Screen.Albums.route) {
                         val libraryViewModel: LibraryViewModel = koinViewModel()
-                        AlbumsScreenWrapper(libraryViewModel)
+                        AlbumsScreenWrapper(libraryViewModel, navController)
                     }
                     composable(Screen.More.route) {
-                        TextMMD(text = "More Screen Stub")
+                        val settingsViewModel: SettingsViewModel = koinViewModel()
+                        SettingsScreenWrapper(settingsViewModel, navController)
+                    }
+                    composable(Screen.Settings.route) {
+                        val settingsViewModel: SettingsViewModel = koinViewModel()
+                        SettingsScreenWrapper(settingsViewModel, navController)
+                    }
+                    composable(Screen.Login.route) {
+                        LoginScreen(
+                            innerPadding = innerPadding,
+                            navController = navController,
+                            hideBottomNavigation = { },
+                            showBottomNavigation = { }
+                        )
                     }
                     composable(Screen.Search.route) {
                         val searchViewModel: SearchViewModel = koinViewModel()
                         SearchScreenWrapper(searchViewModel, viewModel)
+                    }
+                    composable(Screen.AlbumDetails.route + "/{browseId}") { navBackStackEntry ->
+                        val browseId = navBackStackEntry.arguments?.getString("browseId") ?: ""
+                        val albumViewModel: AlbumViewModel = koinViewModel()
+                        AlbumDetailsScreenWrapper(
+                            browseId = browseId,
+                            viewModel = albumViewModel,
+                            navController = navController
+                        )
+                    }
+                    composable(Screen.ArtistDetails.route + "/{channelId}") { navBackStackEntry ->
+                        val channelId = navBackStackEntry.arguments?.getString("channelId") ?: ""
+                        val artistViewModel: ArtistViewModel = koinViewModel()
+                        ArtistDetailsScreenWrapper(
+                            channelId = channelId,
+                            viewModel = artistViewModel,
+                            navController = navController
+                        )
+                    }
+                    composable(Screen.PlaylistDetails.route + "/{playlistId}") { navBackStackEntry ->
+                        val playlistId = navBackStackEntry.arguments?.getString("playlistId") ?: ""
+                        val playlistViewModel: PlaylistViewModel = koinViewModel()
+                        PlaylistDetailsScreenWrapper(
+                            playlistId = playlistId,
+                            viewModel = playlistViewModel,
+                            navController = navController
+                        )
                     }
                 }
             }
@@ -233,9 +278,9 @@ fun EinkApp(viewModel: SharedViewModel) {
                     isDownloadInProgress = false,
                     onDownloadClick = { /* TODO */ },
                     onCancelDownloadClick = { /* TODO */ },
-                    canAddToLibrary = false,
-                    onAddToLibraryClick = { /* TODO */ },
-                    isInLibrary = false,
+                    canAddToLibrary = true,
+                    onAddToLibraryClick = { viewModel.onUIEvent(UIEvent.ToggleLike) },
+                    isInLibrary = viewModel.likeStatus.collectAsState().value,
                     sourceType = SourceType.YOUTUBE,
                 )
             }
