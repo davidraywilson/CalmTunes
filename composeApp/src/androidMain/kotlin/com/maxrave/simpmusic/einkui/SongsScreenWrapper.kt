@@ -5,43 +5,41 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.maxrave.simpmusic.viewModel.LibraryDynamicPlaylistViewModel
-import com.maxrave.simpmusic.viewModel.SharedViewModel
-import com.maxrave.simpmusic.extension.formatDuration
 
 @Composable
 fun SongsScreenWrapper(viewModel: LibraryDynamicPlaylistViewModel) {
-    val songsState by viewModel.listFavoriteSong.collectAsState()
-    
+    val songsState by viewModel.listLibrarySongs.collectAsState()
+    val isLoading by viewModel.librarySongsLoading.collectAsState()
+    val currentSongId by viewModel.nowPlayingVideoId.collectAsState()
+
     val mappedSongs = remember(songsState) {
-        songsState.map { song ->
-            val durationMillis = song.duration.toLong() * 1000
+        songsState.mapIndexed { index, track ->
             SongUiModel(
-                id = song.videoId,
-                title = song.title,
-                artist = song.artistName?.joinToString() ?: "",
-                durationText = song.duration,
-                durationMillis = song.durationSeconds.toLong() * 1000L,
-                trackNumber = null,
+                id = track.videoId,
+                title = track.title,
+                artist = track.artistName?.joinToString() ?: "",
+                durationText = track.duration,
+                durationMillis = track.durationSeconds.toLong().times(1000),
+                trackNumber = index + 1,
                 sourceType = SourceType.YOUTUBE,
                 audioUri = null,
-                album = song.albumName,
-                remoteId = song.videoId
+                album = track.albumName,
+                remoteId = track.videoId,
             )
         }
     }
 
     SongsScreen(
         songs = mappedSongs,
-        isLoading = false,
+        isLoading = isLoading,
         errorMessage = null,
-        currentSongId = null,
+        currentSongId = currentSongId.takeIf { it.isNotEmpty() },
         isSyncInProgress = false,
         onPlaySongClick = { song ->
-            val videoId = song.remoteId ?: song.id
-            viewModel.playSong(videoId, com.maxrave.simpmusic.ui.screen.library.LibraryDynamicPlaylistType.Favorite)
+            viewModel.playSongFromLibrary(song.id)
         },
-        onShuffleClick = { 
-            viewModel.shuffle(com.maxrave.simpmusic.ui.screen.library.LibraryDynamicPlaylistType.Favorite)
+        onShuffleClick = {
+            viewModel.shuffleLibrary()
         },
         onAddToPlaylistClick = { /* TODO */ },
         onRemoveFromLibraryClick = { /* TODO */ },
